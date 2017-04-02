@@ -4,13 +4,15 @@ package main
 
 import (
 	// "fmt"
+	"bytes"
 	"log"
 	"os/exec"
 	// "strings"
+	"strconv"
 	"syscall"
 )
 
-func main() {
+func exitIfDirty() {
 	cmd := exec.Command("git", "diff-index", "--quiet", "HEAD")
 	err := cmd.Start()
 	if err != nil {
@@ -29,5 +31,25 @@ func main() {
 			log.Fatal(err)
 		}
 	}
+}
 
+func main() {
+	exitIfDirty()
+	cmd := exec.Command("git", "describe")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	versions := bytes.Split(bytes.Trim(out.Bytes(), "\n"), []byte("."))
+	for i, version := range versions {
+		v, err := strconv.Atoi(string(version))
+		if err != nil {
+			log.Fatal(err)
+		}
+		versions[i] = v
+	}
+	log.Printf("%#v", versions)
 }
