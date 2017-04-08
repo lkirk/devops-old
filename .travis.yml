@@ -12,4 +12,5 @@ script:
 
 after_failure:
   - git status
-  - find
+  - git tag
+  - git describe
