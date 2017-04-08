@@ -1,5 +1,7 @@
 .PHONY:cross-compile relese clean create-release upload-assets _token-specified?
 
+SHELL:=/bin/bash
+
 bootstrap:
 	curl -H'Accept: application/octet-stream' -sXGET https://api.github.com/repos/lloydkirk/devops/releases/assets/3611154 -L | tar -xzO > devops
 	chmod +x devops
@@ -69,7 +71,7 @@ upload-assets:
 		done ;\
 	done
 
-travis-build-release: bootstrap _user-specified? _token-specified? cross-compile create-release upload-assets
+travis-build-release: _user-specified? _token-specified? bootstrap cross-compile create-release upload-assets
 
 clean:
 	rm -rf $(BUILD)
