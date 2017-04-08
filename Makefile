@@ -71,7 +71,7 @@ upload-assets:
 		done ;\
 	done
 
-travis-build-release: _user-specified? _token-specified? bootstrap cross-compile create-release upload-assets
+travis-build-release: _user-specified? _token-specified? bootstrap cross-compile tar-and-name create-release upload-assets
 
 clean:
 	rm -rf $(BUILD)
