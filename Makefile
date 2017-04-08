@@ -2,10 +2,6 @@
 
 SHELL:=/bin/bash
 
-bootstrap:
-	curl -H'Accept: application/octet-stream' -sXGET https://api.github.com/repos/lloydkirk/devops/releases/assets/3611154 -L | tar -xzO > devops
-	chmod +x devops
-
 OS:=linux darwin windows freebsd
 ARCH:=amd64
 BUILD:=./build
@@ -69,7 +65,7 @@ upload-assets:
 		done ;\
 	done
 
-travis-build-release: _user-specified? _token-specified? bootstrap cross-compile tar-and-name create-release upload-assets
+travis-build-release: _user-specified? _token-specified? cross-compile tar-and-name create-release upload-assets
 
 clean:
 	rm -rf $(BUILD)
