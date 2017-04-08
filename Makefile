@@ -71,7 +71,10 @@ upload-assets:
 		done ;\
 	done
 
-travis-build-release: _user-specified? _token-specified? bootstrap cross-compile create-release upload-assets
+# travis-build-release: _user-specified? _token-specified? bootstrap cross-compile create-release upload-assets
+travis-build-release: _user-specified? _token-specified? bootstrap
+	git status
+	./devops version print || true
 
 clean:
 	rm -rf $(BUILD)
