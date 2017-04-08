@@ -33,7 +33,7 @@ ASSET-HEADER:=-H'Content-Type: application/gzip'
 POST:=curl -sXPOST $(CURL-ARGS)
 GET:=curl -sXGET $(CURL-ARGS)
 SIMPLE-AUTH:=$(GH_USER):$(GH_TOKEN)
-VERSION:=$(shell ./devops version print)
+VERSION:=$(shell cat VERSION)
 
 _token-specified?:
 ifeq ($(GH_TOKEN),)
