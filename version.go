@@ -4,13 +4,81 @@ package main
 
 import (
 	"bytes"
-	"flag"
 	"fmt"
 	"log"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/urfave/cli"
 )
+
+var versionMainCommand []cli.Command
+
+func init() {
+	bumpSubCommands := []cli.Command{
+		{
+			Name:    "patch",
+			Aliases: []string{"p"},
+			Action: func(c *cli.Context) error {
+				exitIfDirty()
+				v := getCurrentVersion()
+				fmt.Println(v.BumpPatch())
+				return nil
+			},
+		},
+
+		{
+			Name:    "minor",
+			Aliases: []string{"mi"},
+			Action: func(c *cli.Context) error {
+				exitIfDirty()
+				v := getCurrentVersion()
+				fmt.Println(v.BumpMinor())
+				return nil
+			},
+		},
+
+		{
+			Name:    "major",
+			Aliases: []string{"ma"},
+			Action: func(c *cli.Context) error {
+				exitIfDirty()
+				v := getCurrentVersion()
+				fmt.Println(v.BumpMajor())
+				return nil
+			},
+		},
+	}
+
+	versionMainCommand = []cli.Command{
+		{
+			Name:    "version",
+			Aliases: []string{"v"},
+			Usage:   "Versioning tools",
+			Subcommands: []cli.Command{
+
+				{
+					Name:    "print",
+					Aliases: []string{"p"},
+					Usage:   "Print current version",
+					Action: func(c *cli.Context) error {
+						exitIfDirty()
+						fmt.Println(getCurrentVersion())
+						return nil
+					},
+				},
+
+				{
+					Name:        "bump",
+					Aliases:     []string{"b"},
+					Usage:       "Print a version incremented by major, minor, or patch",
+					Subcommands: bumpSubCommands,
+				},
+			},
+		},
+	}
+}
 
 type shellCommand struct {
 	cmd    *exec.Cmd
@@ -109,28 +177,4 @@ func getCurrentVersion() *Version {
 		increments[i] = inc
 	}
 	return newVersion(increments[0], increments[1], increments[2])
-}
-
-var (
-	bump  string
-	print bool
-)
-
-func init() {
-	flag.StringVar(&bump, "bump", "", "bump version, with specified increment")
-	flag.BoolVar(&print, "print", false, "print current version")
-}
-
-func main() {
-	flag.Parse()
-	exitIfDirty()
-	v := getCurrentVersion()
-	switch {
-	case len(bump) > 0:
-		v.Bump(bump)
-	case print:
-		fmt.Println(v)
-	default:
-		flag.Usage()
-	}
 }
