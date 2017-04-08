@@ -9,8 +9,7 @@ install:
 before_script:
   - "wget --header='Accept: application/octet-stream' https://api.github.com/repos/lloydkirk/devops/releases/assets/3611154 -O devops.tar.gz"
   - tar -xzf devops.tar.gz
-  - git describe
-  - ./devops version print > VERSION
+  - git describe > VERSION
 
 script:
   - glide install
