@@ -9,3 +9,7 @@ install:
 script:
   - glide install
   - make travis-build-release
+
+after_failure:
+  - git status
+  - find
