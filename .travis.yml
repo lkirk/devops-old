@@ -8,3 +8,4 @@ install:
 
 script:
   - glide install
+  - make travis-build-release
