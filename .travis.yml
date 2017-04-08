@@ -1,10 +1,10 @@
 language: go
 
 go:
-  - master
+  - 1.8.1
 
 install:
   - go get github.com/Masterminds/glide
 
 script:
-  - ls -la
+  - glide install
