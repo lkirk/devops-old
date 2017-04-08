@@ -4,7 +4,6 @@ OS:=linux darwin windows freebsd
 ARCH:=amd64
 BUILD:=./build
 RELEASE-URL:=https://api.github.com/repos/lloydkirk/devops/releases
-VERSION:=$(shell devops version print)
 
 cross-compile:
 	@for os in $(OS); do \
@@ -16,11 +15,14 @@ cross-compile:
 	done
 
 create-release:
-	@post_data=$$(tr -d ' ' <<< '{ \
-		"tag_name": "$(VERSION)" \
-	}') \
+	@set -e ;\
+	version=$$(devops version print) \
+	post_data=$$(tr -d ' ' <<< "{ \
+		\"tag_name\": \"$$version\" \
+	}") \
 	cmd="curl -sXGET $(RELEASE-URL) -d$$post_data";\
-	echo $$cmd
+	echo $$cmd ;\
+	$$cmd
 
 release:
 	@for os in $(OS); do \
