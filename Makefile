@@ -21,10 +21,9 @@ cross-compile:
 
 tar-and-name:
 	@set -e ;\
-	version=$$(./devops version print) ;\
 	for os in $(OS); do \
 		for arch in $(ARCH); do \
-			cmd="cd $(BUILD)/$$os-$$arch && tar -czf devops-$$version-$$os-$$arch.tar.gz devops && cd -" ;\
+			cmd="cd $(BUILD)/$$os-$$arch && tar -czf devops-$(VERSION)-$$os-$$arch.tar.gz devops && cd -" ;\
 			echo $$cmd ;\
 			sh -c "$$cmd" ;\
 		done ;\
@@ -38,6 +37,7 @@ ASSET-HEADER:=-H'Content-Type: application/gzip'
 POST:=curl -sXPOST $(CURL-ARGS)
 GET:=curl -sXGET $(CURL-ARGS)
 SIMPLE-AUTH:=$(GH_USER):$(GH_TOKEN)
+VERSION:=$(shell ./devops version print)
 
 _token-specified?:
 ifeq ($(GH_TOKEN),)
@@ -51,21 +51,19 @@ endif
 
 create-release:
 	@set -e ;\
-	version=$$(./devops version print) ;\
-	post_data=$$(tr -d ' ' <<< "{ \
-		\"tag_name\": \"$$version\" \
-	}") ;\
+	post_data=$$(tr -d ' ' <<< '{ \
+		\"tag_name\": "$(VERSION)" \
+	}') ;\
 	cmd="$(POST) $(RELEASE-URL) -d$$post_data" ;\
 	echo $$cmd ;\
 	$$cmd -u'$(GH_USER):$(GH_TOKEN)'
 
 upload-assets:
 	@set -e ;\
-	version=$$(./devops version print) ;\
 	release_id=$$($(GET) $(RELEASE-URL)/latest | jq '.id') ;\
 	for os in $(OS); do \
 		for arch in $(ARCH); do \
-			cmd="$(POST) $(ASSET-HEADER) --data-binary @devops-$$version-$$os-$$arch.tar.gz $(UPLOAD-URL)/$$release_id/assets?name=devops-$$version-$$os-$$arch.tar.gz" ;\
+			cmd="$(POST) $(ASSET-HEADER) --data-binary @devops-$(VERSION)-$$os-$$arch.tar.gz $(UPLOAD-URL)/$$release_id/assets?name=devops-$(VERSION)-$$os-$$arch.tar.gz" ;\
 			echo $$cmd ;\
 			sh -c "cd $(BUILD)/$$os-$$arch && $$cmd -u'$(GH_USER):$(GH_TOKEN)' && cd -" ;\
 		done ;\
